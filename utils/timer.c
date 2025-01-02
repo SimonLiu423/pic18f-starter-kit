@@ -24,6 +24,10 @@ void Timer2Initialize(IntPriority priority, int prescaler, int postscaler, doubl
     T2CONbits.TMR2ON = 1;
 }
 
+void Timer2SetPeriod(double period_ms){
+    PR2 = (period_ms * (_XTAL_FREQ / 1000)) / (4 * Timer2Prescaler * Timer2Postscaler) - 1;
+}
+
 int Timer2GetPrescaler(void){
     return Timer2Prescaler;
 }
