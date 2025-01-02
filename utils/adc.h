@@ -20,6 +20,7 @@
 #endif
 
 #define ADC_IF PIR1bits.ADIF
+#define ADC_GO ADCON0bits.GO
 
 #define AdcGetResultHigh() (ADRESH)
 #define AdcGetResultLow() (ADRESL)
