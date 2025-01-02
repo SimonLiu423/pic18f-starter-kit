@@ -2,6 +2,7 @@
 #include "settings.h"
 #include <stdio.h>
 #include <xc.h>
+#include <string.h>
 
 char uart_buffer[UART_BUFFER_SIZE];
 int uart_buffer_idx = 0;
@@ -86,3 +87,21 @@ char UartGetChar(void){
     if(uart_buffer_idx == 0) return '\0';
     return uart_buffer[uart_buffer_idx - 1];
 }
+
+int UartBufferEndsWith(const char *str) {
+    int str_len = strlen(str);
+    
+    // Check if buffer has enough characters
+    if (uart_buffer_idx < str_len) {
+        return 0;
+    }
+    
+    // Compare str with end of buffer
+    for (int i = 0; i < str_len; i++) {
+        if (uart_buffer[uart_buffer_idx - str_len + i] != str[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+

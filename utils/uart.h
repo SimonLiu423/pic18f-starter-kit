@@ -33,4 +33,5 @@ void UartSendString(char *str);
 void UartReceiveChar(void);
 char UartGetChar(void);
 void UartSendInt(int num);
+int UartBufferEndsWith(const char *str);
 #endif
