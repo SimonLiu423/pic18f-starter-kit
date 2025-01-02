@@ -1,5 +1,6 @@
 #include "uart.h"
 #include "settings.h"
+#include <stdio.h>
 #include <xc.h>
 
 char uart_buffer[UART_BUFFER_SIZE];
@@ -61,6 +62,12 @@ void UartSendString(char *str){
     for(int i = 0; str[i] != '\0'; i++){
         UartSendChar(str[i]);
     }
+}
+
+void UartSendInt(int num){
+    char str[10];
+    sprintf(str, "%d", num);
+    UartSendString(str);
 }
 
 void UartReceiveChar(void){
