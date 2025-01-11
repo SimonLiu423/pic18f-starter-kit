@@ -16,16 +16,29 @@
 #include "utils/timer.h"
 #define MOTOR_PERIOD_MS 20
 #define MOTOR_POS_90_DEG_US 2400
+#define MOTOR_POS_45_DEG_US 1925
 #define MOTOR_0_DEG_US 1450
+#define MOTOR_NEG_45_DEG_US 975
 #define MOTOR_NEG_90_DEG_US 500
 
 int flag = 0;
 int prev_adc_val = 0;
+int state = 0;
+int start_val = 0;
+
+
+//void putch(char c){
+//    UartSendChar(c);
+//}
+//
+//int getch(void){
+//    return UartGetChar();
+//}
 
 void SystemInitialize(void){
     IntConfig int_config = {
         .button = INTERRUPT_HIGH,
-        .adc = INTERRUPT_HIGH,
+        .adc = INTERRUPT_LOW,
         .timer = INTERRUPT_NONE,
         .uart_tx = INTERRUPT_NONE,
         .uart_rx = INTERRUPT_LOW,
@@ -38,42 +51,23 @@ void SystemInitialize(void){
     };
 
     OscillatorInitialize();
-    ComponentInitialize(COMPONENT_LED | COMPONENT_BUTTON | COMPONENT_PWM,
+    ComponentInitialize(COMPONENT_LED | COMPONENT_UART,
                         &int_config, component_config);
-    PWMSetDutyCycle(MOTOR_NEG_90_DEG_US);
+    // PWMSetDutyCycle(MOTOR_0_DEG_US);
 }
 
 void main(void) {
     SystemInitialize();
-    while(1);
+    while(1){
+    };
     return;
 }
 
 void __interrupt(high_priority) HighIsr(void){
     if(BUTTON_IF){
-        LedSet(LedValue() + 1);
-        if(flag == 0){
-            PWMSetDutyCycle(MOTOR_POS_90_DEG_US);
-            flag = 1;
-        }else{
-            PWMSetDutyCycle(MOTOR_NEG_90_DEG_US);
-            flag = 0;
-        }
         ButtonIntDone();
     }
-    if(ADC_IF){
-        int val = AdcGetResultHigh();
-        if(abs(val - prev_adc_val) > 10){
-            LedSet(LedValue() + 1);
-            prev_adc_val = val;
-            __delay_ms(500);
-        }
-
-        AdcIntDone();
-        AdcStartConversion();
-    }
     if(Timer2IF){
-        LedSet(LedValue() + 1);
         Timer2IntDone();
     }
 }
@@ -81,5 +75,24 @@ void __interrupt(high_priority) HighIsr(void){
 void __interrupt(low_priority) LowIsr(void){
     if(RCIF){
         UartReceiveChar();
+        char ch = UartGetChar();
+
+        if(ch == '\r'){
+            UartClearBuffer();
+        } else {
+            if(flag == 0){
+                state = ch - '0';
+                flag = 1;
+            } else {
+                start_val = ch - '0';
+                LedSet(start_val);
+            }
+        }
+    }
+    if(ADC_IF){
+        int val = AdcGetResultHigh();
+        PWMSetDutyCycle((MOTOR_POS_90_DEG_US - MOTOR_0_DEG_US) * (double)val / 0b11111111 + MOTOR_0_DEG_US);
+        AdcStartConversion();
+        AdcIntDone();
     }
 }
