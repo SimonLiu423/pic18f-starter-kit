@@ -105,3 +105,9 @@ int UartBufferEndsWith(const char *str) {
     return 1;
 }
 
+void UartCopyBufferToString(char *str) {
+    for(int i = 0; i < uart_buffer_idx; i++) {
+        str[i] = uart_buffer[i];
+    }
+    str[uart_buffer_idx] = '\0';
+}

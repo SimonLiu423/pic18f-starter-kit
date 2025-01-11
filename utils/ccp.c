@@ -3,6 +3,7 @@
 #include "config.h"
 
 double PWMDutyCycle = 0;
+int MotorDegree = 0;
 
 void PWMInitialize(double period_ms){
     TRISCbits.TRISC2 = 0;
@@ -57,4 +58,20 @@ void MotorRotateWithDelay(double target_duty_cycle){
         }
         __delay_ms(2);
     }
+}
+
+void MotorRotateDegree(int degree){
+    MotorDegree = degree;
+    double duty_cycle = (MOTOR_POS_90_DEG_US - MOTOR_NEG_90_DEG_US) * (double)(degree + 90) / 180 + MOTOR_NEG_90_DEG_US;
+    PWMSetDutyCycle(duty_cycle);
+}
+
+void MotorRotateDegreeWithDelay(int degree){
+    MotorDegree = degree;
+    double duty_cycle = (MOTOR_POS_90_DEG_US - MOTOR_NEG_90_DEG_US) * (double)(degree + 90) / 180 + MOTOR_NEG_90_DEG_US;
+    MotorRotateWithDelay(duty_cycle);
+}
+
+int MotorGetRotateDegree(){
+    return MotorDegree;
 }
