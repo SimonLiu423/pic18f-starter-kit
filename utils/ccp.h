@@ -15,4 +15,10 @@ void MotorRotateWithDelay(double target_duty_cycle);
 void MotorRotateDegree(int degree);
 void MotorRotateDegreeWithDelay(int degree);
 int MotorGetRotateDegree();
+void PWM2SetDutyCycle(double duty_cycle_us);
+double PWM2GetDutyCycle();
+void Motor2RotateWithDelay(double target_duty_cycle);
+void Motor2RotateDegree(int degree);
+void Motor2RotateDegreeWithDelay(int degree);
+int Motor2GetRotateDegree();
 #endif
