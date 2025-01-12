@@ -3,11 +3,15 @@
 #include "config.h"
 
 double PWMDutyCycle = 0;
+double PWM2DutyCycle = 0;
 int MotorDegree = 0;
+int Motor2Degree = 0;
 
 void PWMInitialize(double period_ms){
     TRISCbits.TRISC2 = 0;
+    TRISCbits.TRISC1 = 0;
     CCP1CONbits.CCP1M = 0b1100;
+    CCP2CONbits.CCP2M = 0b1100;
     if(_XTAL_FREQ <= 1000000){
         Timer2Initialize(INTERRUPT_NONE, 4, 16, 0);
     } else {
@@ -74,4 +78,48 @@ void MotorRotateDegreeWithDelay(int degree){
 
 int MotorGetRotateDegree(){
     return MotorDegree;
+}
+
+void PWM2SetDutyCycle(double duty_cycle_us){
+    PWM2DutyCycle = duty_cycle_us;
+    int prescaler = Timer2GetPrescaler();
+    long long val = (PWM2DutyCycle * _XTAL_FREQ / 1000000) / prescaler;
+    CCPR2L = (val >> 2) & 0xFF;
+    CCP2CONbits.DC2B = (val & 0x03);
+}
+
+double PWM2GetDutyCycle(){
+    return PWM2DutyCycle;
+}
+
+void Motor2RotateWithDelay(double target_duty_cycle){
+    while(PWM2DutyCycle != target_duty_cycle){
+        double next_duty_cycle;
+        if(PWM2DutyCycle < target_duty_cycle){
+            next_duty_cycle = PWM2DutyCycle + PWM_MOTOR_STRIDE;
+            if(next_duty_cycle > target_duty_cycle) next_duty_cycle = target_duty_cycle;
+            PWM2SetDutyCycle(next_duty_cycle);
+        } else if(PWM2DutyCycle > target_duty_cycle){
+            next_duty_cycle = PWM2DutyCycle - PWM_MOTOR_STRIDE;
+            if(next_duty_cycle < target_duty_cycle) next_duty_cycle = target_duty_cycle;
+            PWM2SetDutyCycle(next_duty_cycle);
+        }
+        __delay_ms(2);
+    }
+}
+
+void Motor2RotateDegree(int degree){
+    Motor2Degree = degree;
+    double duty_cycle = (MOTOR_POS_90_DEG_US - MOTOR_NEG_90_DEG_US) * (double)(degree + 90) / 180 + MOTOR_NEG_90_DEG_US;
+    PWM2SetDutyCycle(duty_cycle);
+}
+
+void Motor2RotateDegreeWithDelay(int degree){
+    Motor2Degree = degree;
+    double duty_cycle = (MOTOR_POS_90_DEG_US - MOTOR_NEG_90_DEG_US) * (double)(degree + 90) / 180 + MOTOR_NEG_90_DEG_US;
+    Motor2RotateWithDelay(duty_cycle);
+}
+
+int Motor2GetRotateDegree(){
+    return Motor2Degree;
 }
