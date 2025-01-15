@@ -82,9 +82,13 @@ void ComponentInitialize(SystemComponents components, IntConfig *int_config, Com
         if(int_config) AdcInitialize(int_config->adc);
         else AdcInitialize(INTERRUPT_NONE);
     }
-    if (components & COMPONENT_TIMER) {
-        if(int_config) Timer2Initialize(int_config->timer, component_config.prescaler, component_config.postscaler, component_config.timer_period_ms);
-        else Timer2Initialize(INTERRUPT_NONE, component_config.prescaler, component_config.postscaler, component_config.timer_period_ms);
+    if(components & COMPONENT_TIMER1){
+        if(int_config) Timer1Initialize(int_config->timer1, component_config.prescaler1);
+        else Timer1Initialize(INTERRUPT_NONE, component_config.prescaler1);
+    }
+    if (components & COMPONENT_TIMER2) {
+        if(int_config) Timer2Initialize(int_config->timer2, component_config.prescaler2, component_config.postscaler2, component_config.timer_period_ms);
+        else Timer2Initialize(INTERRUPT_NONE, component_config.prescaler2, component_config.postscaler2, component_config.timer_period_ms);
     }
     if (components & COMPONENT_UART) {
         if(int_config) UartInitialize(int_config->uart_tx, int_config->uart_rx);

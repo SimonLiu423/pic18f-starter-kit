@@ -37,14 +37,16 @@ typedef enum {
 typedef struct {
     IntPriority button;
     IntPriority adc;
-    IntPriority timer;
+    IntPriority timer1;
+    IntPriority timer2;
     IntPriority uart_tx;
     IntPriority uart_rx;
 } IntConfig;
 
 typedef struct {
-    int prescaler;
-    int postscaler;
+    int prescaler1;
+    int prescaler2;
+    int postscaler2;
     int timer_period_ms;
     int pwm_period_ms;
 } ComponentConfig;
@@ -68,8 +70,9 @@ typedef enum {
     COMPONENT_ADC         = 0x04,
     COMPONENT_PWM         = 0x08,
     COMPONENT_UART        = 0x10,
-    COMPONENT_TIMER       = 0x20,
-    COMPONENT_ALL         = 0x3F
+    COMPONENT_TIMER1      = 0x20,
+    COMPONENT_TIMER2      = 0x40,
+    COMPONENT_ALL         = 0x7F
 } SystemComponents;
 
 typedef enum {
