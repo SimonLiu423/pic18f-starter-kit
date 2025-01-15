@@ -1,11 +1,13 @@
 #include "timer.h"
 #include "settings.h"
 
+int Timer1Prescaler = 8;
 int Timer2Prescaler = 16;
 int Timer2Postscaler = 16;
 
 void Timer1Initialize(IntPriority priority, int prescaler){
     T1CONbits.RD16 = 1;
+    Timer1Prescaler = prescaler;
     switch(prescaler){
         case 8:
             T1CONbits.T1CKPS = 0b11;
@@ -27,7 +29,7 @@ void Timer1Initialize(IntPriority priority, int prescaler){
         IPR1bits.TMR1IP = priority;
     }
 
-    T1CONbits.T1ON = 1;
+    T1CONbits.TMR1ON = 1;
 }
 
 void Timer1SetPeriod(double period_ms){
